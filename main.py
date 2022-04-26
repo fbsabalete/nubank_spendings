@@ -8,9 +8,11 @@ from jwt import decode
 import pandas as pd
 from pynubank import Nubank, MockHttpClient
 
-logging.basicConfig(handlers=[
+logging.basicConfig(
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    level=logging.INFO, handlers=[
     logging.FileHandler((Path(__file__).resolve().parent / "debug.log"), mode="w"),
-    logging.StreamHandler(sys.stdout)
+    logging.StreamHandler()
 ])
 
 logger = logging.getLogger(__name__)
@@ -21,8 +23,8 @@ def get_from_nubank(table_path: str):
 
     authenticate(nu)
     bills = nu.get_bills()
-    nu.get_bill_details()
     data = list(map(get_relevant_data, bills))
+    logger.info(f"Successful bills request, returned {len(data)} bills")
     write_excel(data, table_path)
 
 
@@ -30,7 +32,10 @@ def authenticate(nu: Nubank):
     resources_path = (Path(__file__).resolve().parent / "resources/")
     resources_path.mkdir(parents=True, exist_ok=True)
     token_file_path = str(resources_path / "refreshToken.txt")
-    cert_path = str(resources_path / "cert.p12")
+    cert_path = (resources_path / "cert.p12")
+    if not cert_path.exists():
+        raise AssertionError("cert was not generated, run 'pynubank' first")
+    cert_path = str(cert_path)
     with open(token_file_path, "r") as file:
         lines = file.readlines()
 
@@ -47,6 +52,7 @@ def authenticate(nu: Nubank):
         new_token = refresh_credentials(cert_path, nu)
 
     lines = [new_token]
+    logger.info("Updated token successfully")
     with open(token_file_path, "w") as file:
         file.writelines(lines)
 
