@@ -1,6 +1,7 @@
 import datetime
 import logging
 import sys
+import argparse
 from getpass import getpass
 from pathlib import Path
 
@@ -98,11 +99,11 @@ def write_excel(data, table_path):
     df.to_excel(table_path)
 
 
-def main(argv):
-    if "-path" not in argv:
-        table_path = (Path(__file__).resolve().parent / "bills/nubank_bills.xlsx")
+def main(args):
+    if args.path:
+        table_path = (Path(args.path).resolve().parent / "bills/nubank_bills.xlsx")
     else:
-        table_path = (Path(argv[2]).resolve().parent / "bills/nubank_bills.xlsx")
+        table_path = (Path(__file__).resolve().parent / "bills/nubank_bills.xlsx")
 
     table_path.parent.mkdir(parents=True, exist_ok=True)
     table_path_str = str(table_path)
@@ -121,4 +122,6 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 sys.excepthook = handle_exception
 
 if __name__ == '__main__':
-    main(sys.argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-path", "--path", "-p", help="Path to store .xlsx. Parent folder bills/ will be created if needed")
+    main(parser.parse_args())
