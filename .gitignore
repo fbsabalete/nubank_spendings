@@ -1,6 +1,7 @@
 .idea/
 
 bills/
+balances/
 
 resources/
 debug.log
