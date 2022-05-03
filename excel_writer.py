@@ -10,6 +10,7 @@ def write_excel(data, table_path: Path):
     if old_table.exists():
         date_now = datetime.datetime\
             .fromtimestamp(int(old_table.stat().st_mtime)).replace(microsecond=0).isoformat().replace(":", "-")
-        old_table.rename(old_table.with_name(old_table.stem + date_now + ".xlsx"))
+        old_table.rename(old_table.with_name(f"{old_table.stem}_{date_now}.xlsx"))
+
     df = pd.DataFrame.from_dict(data)
     df.to_excel(table_path)
