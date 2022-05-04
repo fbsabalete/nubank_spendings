@@ -5,6 +5,7 @@ from pathlib import Path
 
 from pynubank import Nubank, MockHttpClient
 from balances import update_balance_data
+from debit_statements import update_debit_statements_data
 
 from auth import authenticate
 from bills import update_bills_data
@@ -24,6 +25,7 @@ def get_from_nubank(table_path: str, nu: Nubank = Nubank()):
     authenticate(nu)
 
     update_bills_data(nu, table_path)
+    update_debit_statements_data(nu, table_path)
     # update_balance_data(nu, table_path)
 
 
@@ -31,8 +33,10 @@ def mock_nubank(table_path: str, nu):
     nu = Nubank(MockHttpClient())
     # authenticate(nu)
     nu.authenticate_with_cert("1231", "password", "cert.p12")
-    update_bills_data(nu, table_path)
-    update_balance_data(nu, table_path)
+    statements = list(filter(lambda x: x["__typename"] == "DebitPurchaseEvent", nu.get_account_statements()))
+    logger.info(statements)
+    # update_bills_data(nu, table_path)
+    # update_balance_data(nu, table_path)
 
 
 def main(args):
