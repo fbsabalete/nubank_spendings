@@ -7,11 +7,18 @@ from jwt import decode
 from getpass import getpass
 
 
+def create_token_file(path: Path):
+    with path.open("w", encoding="utf-8") as f:
+        f.write("")
+
+
 def authenticate(nu: Nubank):
     logger = logging.getLogger(__name__)
     resources_path = (Path(__file__).resolve().parent / "resources/")
     resources_path.mkdir(parents=True, exist_ok=True)
-    token_file_path = str(resources_path / "refreshToken.txt")
+    token_file_path = resources_path / "refreshToken.txt"
+    if not token_file_path.exists():
+        create_token_file(token_file_path)
     cert_path = (resources_path / "cert.p12")
     if not cert_path.exists():
         raise AssertionError("cert was not generated, run 'pynubank' first")
