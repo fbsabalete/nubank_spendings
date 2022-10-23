@@ -19,23 +19,22 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def get_from_nubank(table_path: str, nu: Nubank = Nubank()):
+def get_from_nubank(table_path: str, all_pages: bool, nu: Nubank = Nubank()):
     authenticate(nu)
 
     update_bills_data(nu, table_path)
-    update_debit_statements_data(nu, table_path)
+    update_debit_statements_data(nu, table_path, all_pages)
 
 
 def mock_nubank(table_path: str, nu):
     # authenticate(nu)
     nu.authenticate_with_cert("1231", "password", "cert.p12")
-    statements = list(filter(lambda x: x["__typename"] == "DebitPurchaseEvent", nu.get_account_statements()))
-    logger.info(statements)
-    # update_bills_data(nu, table_path)
-    # update_balance_data(nu, table_path)
+    update_bills_data(nu, table_path)
+    update_debit_statements_data(nu, table_path)
 
 
 def main(args):
+    logger.info(args.path)
     if args.path:
         table_path = str(Path(args.path).resolve().parent)
     else:
@@ -45,7 +44,7 @@ def main(args):
         table_path = str(Path(__file__).resolve().parent)
         mock_nubank(table_path, Nubank(MockHttpClient()))
     else:
-        get_from_nubank(table_path)
+        get_from_nubank(table_path, args.all)
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -63,4 +62,6 @@ if __name__ == '__main__':
     parser.add_argument("-path", "--path", "-p",
                         help="Path to store .xlsx. Parent folder will be created if needed")
     parser.add_argument("-m", "--mock", "-mock", action='store_true')
+    parser.add_argument("-a", "--all", "-all", action='store_true',
+                        help="If should request all pages recursively, initial load of data")
     main(parser.parse_args())
