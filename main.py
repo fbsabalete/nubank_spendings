@@ -8,6 +8,7 @@ from pynubank import Nubank, MockHttpClient
 from debit_statements import update_debit_statements_data
 from bills import update_bills_data
 from credit_balance import update_credit_balance_data
+from account_balance import update_account_balance_data
 
 from auth import authenticate
 
@@ -27,6 +28,7 @@ def get_from_nubank(table_path: str, all_pages: bool, nu: Nubank = Nubank()):
     update_bills_data(nu, table_path)
     update_credit_balance_data(nu, table_path)
     update_debit_statements_data(nu, table_path, all_pages)
+    update_account_balance_data(nu, table_path)
 
 
 def mock_nubank(table_path: str, nu):
