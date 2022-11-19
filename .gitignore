@@ -3,6 +3,7 @@
 bills/
 balances/
 statements/
+credit_balance/
 
 resources/
 debug.log
